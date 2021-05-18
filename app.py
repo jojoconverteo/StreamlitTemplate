@@ -9,16 +9,16 @@ data = st.file_uploader("Upload a Dataset", type=["csv", "txt"])
 
 if data is not None:
     df = pd.read_csv(data, encoding=config.encoding, sep=config.sep)
-    List_columns = [w for w in df.columns if 'levier' not in w]
+    df_melt = pd.melt(df, id_vars="date")
 
-    if st.checkbox("Show Coefficient :"):
-        st_columns_without_labels = st.selectbox("Coefficient", List_columns)
-
-        if st_columns_without_labels is not None:
-            df_sorted = df.sort_values(by=st_columns_without_labels)
-            fig = px.bar(df_sorted, y="leviers", x=st_columns_without_labels, orientation='h', height=1000)
-            st.write(df_sorted.set_index("leviers"))
-            st.plotly_chart(fig)
+    if st.checkbox("Contribution Temporel :"):
+        fig = px.line(df_melt, x="date", y="value", color="variable")
+        st.plotly_chart(fig)
+            
+    if st.checkbox("Contribution Moyenne :"):
+        df_bar = df_melt.groupby("variable").mean().reset_index()
+        fig = px.bar(df_bar.sort_values(by="value"), x="value", y="variable", orientation='h')
+        st.plotly_chart(fig)
             
 
 
