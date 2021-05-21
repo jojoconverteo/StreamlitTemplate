@@ -3,23 +3,28 @@ import streamlit as st
 import plotly.express as px
 import config
 
-st.title("Contribution : Analyse Streamlit")
+st.title("Remanence X KPI : Analyse Streamlit")
 
-data = st.file_uploader("Upload a Dataset", type=["csv", "txt"])
+data = st.file_uploader("Upload a Dataset", type=config.type)
 
 if data is not None:
     df = pd.read_csv(data, encoding=config.encoding, sep=config.sep)
-    df_melt = pd.melt(df, id_vars="date")
+    st_budget = st.selectbox("Leviers", config.columns_budget)
 
-    if st.checkbox("Contribution Temporel :"):
-        fig = px.line(df_melt, x="date", y="value", color="variable")
-        st.plotly_chart(fig)
-            
-    if st.checkbox("Contribution Moyenne :"):
-        df_bar = df_melt.groupby("variable").mean().reset_index()
-        fig = px.bar(df_bar.sort_values(by="value"), x="value", y="variable", orientation='h')
-        st.plotly_chart(fig)
-            
+    if st_budget is not None:
+        min_cluster = min(config.clusters)
+        max_cluster = max(config.clusters)
+        st_cluster = st.slider('Cluster :', min_cluster, max_cluster)
+
+        if st_cluster is not None:
+            df_cluster = df[df[config.column_cluster] == st_cluster]
+            fig = px.scatter(df_cluster, x=st_budget, y=config.column_kpi, trendline="ols")
+            results = px.get_trendline_results(fig)
+
+            st.plotly_chart(fig)
+
+
+                
 
 
        
