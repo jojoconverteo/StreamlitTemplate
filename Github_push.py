@@ -8,7 +8,7 @@ def push_to_git():
 
     all_step_packaging = [step_4, step_5, setp_6]
 
-    for step in all_step_packaging: os.system(f"{step}")
+    for step in all_step_packaging: os.system(step)
 
 
 if __name__ == "__main__":
